@@ -25,6 +25,7 @@
 #include <Matrix.h>
 #include <cmath>
 #include <Tab.h>
+#include <TabWidget.h>
 #include <Pid.h>
 #include <Ahrs.h>
 #include <AhrsData.h>
@@ -41,9 +42,6 @@ using namespace flair::meta;
 
 AdaptiveFNN::AdaptiveFNN(TargetController *controller): UavStateMachine(controller), behaviourMode(BehaviourMode_t::Default), vrpnLost(false) {
     Uav* uav=GetUav();
-
-    //create the controller
-    //AFNNC *customController = new AFNNC();
 
     VrpnClient* vrpnclient=new VrpnClient("vrpn", uav->GetDefaultVrpnAddress(),80,uav->GetDefaultVrpnConnectionType());
     
@@ -66,7 +64,16 @@ AdaptiveFNN::AdaptiveFNN(TargetController *controller): UavStateMachine(controll
     getFrameworkManager()->AddDeviceToLog(uavVrpn);
     getFrameworkManager()->AddDeviceToLog(targetVrpn);
     vrpnclient->Start();
-    
+
+    // Create a tab for the proposed controller
+    Tab *lawTab2 = new Tab(getFrameworkManager()->GetTabWidget(), "Proposed controller");
+	TabWidget *tabWidget2 = new TabWidget(lawTab2->NewRow(), "controller");
+    setupLawTab2 = new Tab(tabWidget2, "Setup controller"); // Setup tab
+
+    // Create the controller
+    customController = new AFNNC( setupLawTab2->At(0,0), "AFNNC");
+
+
     uav->GetAhrs()->YawPlot()->AddCurve(uavVrpn->State()->Element(2),DataPlot::Green);
 																 
     startCircle=new PushButton(GetButtonsLayout()->NewRow(),"start_circle");
@@ -255,6 +262,7 @@ void AdaptiveFNN::ExtraCheckPushButton(void) {
         //VrpnPositionHold();
         if (SetTorqueMode(TorqueMode_t::Custom) && SetThrustMode(ThrustMode_t::Custom))
         {
+			customController->reset();
             Thread::Info("AMONOOOOOOOOS!!!\n");
         }
         else
@@ -343,43 +351,37 @@ void AdaptiveFNN::VrpnPositionHold(void) {
 
 void AdaptiveFNN::fnn_controller(Euler &torques)
 {
-    flair::core::Time ti = GetTime();
-    const AhrsData *refOrientation = GetDefaultReferenceOrientation();
-    Quaternion refQuaternion;
-    Vector3Df refAngularRates;
-    refOrientation->GetQuaternionAndAngularRates(refQuaternion, refAngularRates);
-    flair::core::Time  tf = GetTime()-ti;
+  	float tactual=double(GetTime())/1000000000-customController->t0;
+    Vector3Df xid, xidp, xidpp, xidppp;
 
-    ti = GetTime();
+    Vector3Df uav_pos,uav_vel;
+    Quaternion uav_quat;
+
+    uavVrpn->GetPosition(uav_pos);
+    uavVrpn->GetSpeed(uav_vel);
+    uavVrpn->GetQuaternion(uav_quat);
+
     const AhrsData *currentOrientation = GetDefaultOrientation();
     Quaternion currentQuaternion;
     Vector3Df currentAngularRates;
     currentOrientation->GetQuaternionAndAngularRates(currentQuaternion, currentAngularRates);
-    tf = tf = GetTime()-ti;
 
-    float refAltitude, refVerticalVelocity;
-    GetDefaultReferenceAltitude(refAltitude, refVerticalVelocity);
+    Vector3Df currentAngularSpeed = GetCurrentAngularSpeed();
 
-    float z, zp;
+    xid = Vector3Df(1,1,1);
+    xidp = Vector3Df(0,0,0);
+    xidpp = Vector3Df(0,0,0);
+    xidppp = Vector3Df(0,0,0);
 
-    AltitudeValues(z,zp);
 
-    float ze = z - refAltitude;
+  	customController->SetValues(uav_pos-xid,uav_vel-xidp,xid,xidpp,xidppp,currentAngularRates,currentQuaternion);
+    customController->Update(GetTime()); // ToDo: Bug al ejecutar esta función.
 
-    customController->setTunningParameters(0.1,0.1,0.1,0.1,0.1,0.1);
+    torques.roll = 0.1 ; //customController->Output(0);
+    torques.pitch = 0.1 ; //customController->Output(1);
+    torques.yaw = 0.1 ; //customController->Output(2);
+    thrust = -6 ; //customController->Output(3);
 
-    //QuasiperiodicFNN_controller->SetValues(ze,zp,currentAngularRates,refAngularRates,currentQuaternion,refQuaternion);
-
-    //QuasiperiodicFNN_controller->Update(GetTime());
-
-    //torques.roll = QuasiperiodicFNN_controller->Output(0);
-    //torques.pitch = QuasiperiodicFNN_controller->Output(1);
-    //torques.yaw = QuasiperiodicFNN_controller->Output(2);
-
-    torques.roll=0.0001;
-    torques.pitch=0.00001;
-    torques.yaw=0.01;
-    thrust = 10; //ComputeDefaultThrust();
 }
 
 float AdaptiveFNN::ComputeCustomThrust(void) {

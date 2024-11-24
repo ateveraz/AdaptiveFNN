@@ -13,7 +13,7 @@ public:
     FourierNN();
     ~FourierNN();
 
-    void setFourierNN(const float W0_, const float W1_, const float omega_, const float threshold_);
+    void setFourierNN(const Eigen::Matrix3f W0_, const float W1_, const float omega_, const float threshold_);
     Eigen::Vector3f computeFourierNN(Eigen::Vector3f& errorSM, float t, float delta_t);
     void ResetWeights();
 
@@ -27,7 +27,9 @@ private:
     void getInputs(float t);
     Eigen::Matrix<float, 3, 7> updateWeights(const Eigen::Matrix3f& Psi, const Eigen::Vector3f& nu);
 
-    float W0, W1, threshold, omega;
+    float W1, threshold, omega;
+
+    Eigen::Matrix3f W0;
 };
 
 #endif //FOURIERNN_H

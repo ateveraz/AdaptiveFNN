@@ -22,6 +22,7 @@ SET(SRC_FILES
 	src/FourierNN.cpp
 	src/AdapIntegralGain.cpp
 	src/AFNNC.cpp
+	src/ISMCP.cpp
 )
 
 FLAIR_DEMO(${PROJECT_NAME} "${SRC_FILES}"

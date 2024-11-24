@@ -12,7 +12,7 @@ FourierNN::FourierNN() : Weights(Eigen::Matrix<float, 3, 7>::Zero()), InputBase(
 
 FourierNN::~FourierNN() { }
 
-void FourierNN::setFourierNN(const float W0_, const float W1_, const float omega_, const float threshold_)
+void FourierNN::setFourierNN(const Eigen::Matrix3f W0_, const float W1_, const float omega_, const float threshold_)
 {
     W0 = W0_;
     W1 = W1_;

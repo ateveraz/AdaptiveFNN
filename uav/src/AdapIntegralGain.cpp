@@ -7,7 +7,7 @@
 #include "NMethods.h"
 #include <Eigen/Dense>
 
-AdapIntegralGain::AdapIntegralGain() : Gamma_hat(Eigen::Matrix3f::Zero()), gamma0(0.0) {}
+AdapIntegralGain::AdapIntegralGain() : Gamma_hat(Eigen::Matrix3f::Zero()) {}
 
 AdapIntegralGain::~AdapIntegralGain() {}
 
@@ -16,7 +16,7 @@ void AdapIntegralGain::ResetGain() {
     Gamma_hat = Eigen::Matrix3f::Zero();
 }
 
-void AdapIntegralGain::setAdaptiveIntegralGain(const float gamma0_, const float gamma1_) {
+void AdapIntegralGain::setAdaptiveIntegralGain(const Eigen::Matrix3f gamma0_, const float gamma1_) {
     // Set the value of gamma0
     gamma0 = gamma0_;
     gamma1 = gamma1_;

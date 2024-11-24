@@ -21,9 +21,12 @@ namespace flair {
     namespace gui {
         class PushButton;
         class ComboBox;
+        class Tab;
     }
     namespace filter {
         class TrajectoryGenerator2DCircle;
+        class AFNNC;
+
     }
     namespace meta {
         class MetaVrpnObject;
@@ -70,13 +73,17 @@ class AdaptiveFNN : public flair::meta::UavStateMachine {
         float yawHold;
         float thrust;
 
+        flair::gui::Tab *settings, *lawTab2, *setupLawTab2;
+        flair::gui::TabWidget *tabWidget2;
+
+
         flair::gui::PushButton *startCircle,*stopCircle,*positionHold;
         flair::gui::ComboBox *taskMode;
         flair::meta::MetaVrpnObject *targetVrpn,*uavVrpn;
         flair::filter::TrajectoryGenerator2DCircle *circle;
         flair::core::AhrsData *customReferenceOrientation,*customOrientation;
 
-	AFNNC *customController;
+		flair::filter::AFNNC *customController;
 };
 
 #endif // CIRCLEFOLLOWER_H
