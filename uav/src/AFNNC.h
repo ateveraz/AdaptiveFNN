@@ -73,7 +73,7 @@ class AFNNC : public ControlLaw, public FourierNN, public AdapIntegralGain, publ
   * \param w Velocidad angular
   * \param q Cuaternio de orientacion
   */
-    void SetValues(flair::core::Vector3Df xie, flair::core::Vector3Df xiep, flair::core::Vector3Df xid,
+    	void SetValues(flair::core::Vector3Df xie, flair::core::Vector3Df xiep, flair::core::Vector3Df xid,
                     flair::core::Vector3Df xidpp, flair::core::Vector3Df xidppp, flair::core::Vector3Df w, flair::core::Quaternion q);
 
         void UpdateFrom(const flair::core::io_data *data);
@@ -86,7 +86,6 @@ class AFNNC : public ControlLaw, public FourierNN, public AdapIntegralGain, publ
 		std::chrono::high_resolution_clock::time_point previous_chrono_time;
 		bool firstUpdate;
 
-        flair::core::Matrix *input; // Description Matrix
 		flair::core::Matrix *exp_data; // Description Matrix
 
         float Sat(float value, float borne);
