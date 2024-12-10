@@ -17,19 +17,21 @@ class ISMCP {
 
         void resetISMCP();
         void setISMCP(const float m_, const float g_, Eigen::Matrix3f alphap_, Eigen::Matrix3f gammap_, Eigen::Matrix3f Kpm_);
-        void solveSubactuation(const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp, Eigen::Vector3f ez);
+        void solveSubactuation(const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp);
         Eigen::Vector3f getWd();
         Eigen::Quaternionf getQd();
+        float getTrs();
 
     private:
         float sech(float value);
 
 
-        float delta_t;
+        float delta_t, Trs;
 
         Eigen::Vector3f sgnpos_p, sgnpos, sgnori_p, sgnori;
         Eigen::Matrix3f I = Eigen::Matrix3f::Identity(3,3);
 
+		Eigen::Vector3f ez = Eigen::Vector3f(0,0,1);
         Eigen::Vector3f wd;
         Eigen::Quaternionf qd;
 

@@ -112,15 +112,19 @@ AdaptiveFNN::~AdaptiveFNN() {
 
 void AdaptiveFNN::ComputeCustomTorques(Euler &torques) {
     ComputeDefaultTorques(torques);
-    thrust=ComputeCustomThrust();
+    thrust=ComputeDefaultThrust();
 
     switch(taskMode->CurrentIndex())
     {
-      case 0:
+      case 2:
         fnn_controller(torques);
         Thread::Info("Regulation activateeeed \n");
         break;
     }
+}
+
+float AdaptiveFNN::ComputeCustomThrust(void) {
+    return thrust;
 }
 
 const AhrsData *AdaptiveFNN::GetOrientation(void) const {
@@ -368,7 +372,7 @@ void AdaptiveFNN::fnn_controller(Euler &torques)
 
     Vector3Df currentAngularSpeed = GetCurrentAngularSpeed();
 
-    xid = Vector3Df(1,1,1);
+    xid = Vector3Df(0,0,1);
     xidp = Vector3Df(0,0,0);
     xidpp = Vector3Df(0,0,0);
     xidppp = Vector3Df(0,0,0);
@@ -377,13 +381,9 @@ void AdaptiveFNN::fnn_controller(Euler &torques)
   	customController->SetValues(uav_pos-xid,uav_vel-xidp,xid,xidpp,xidppp,currentAngularRates,currentQuaternion);
     customController->Update(GetTime()); // ToDo: Bug al ejecutar esta función.
 
-    torques.roll = 0.1 ; //customController->Output(0);
-    torques.pitch = 0.1 ; //customController->Output(1);
-    torques.yaw = 0.1 ; //customController->Output(2);
-    thrust = -6 ; //customController->Output(3);
+    torques.roll = customController->Output(0);
+    torques.pitch = customController->Output(1);
+    torques.yaw = customController->Output(2);
+    thrust = customController->Output(3);
 
-}
-
-float AdaptiveFNN::ComputeCustomThrust(void) {
-    return thrust;
 }

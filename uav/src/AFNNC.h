@@ -78,7 +78,7 @@ class AFNNC : public ControlLaw, public FourierNN, public AdapIntegralGain, publ
 
         void UpdateFrom(const flair::core::io_data *data);
 
-        void cartesian2configuration(Eigen::Quaternionf &qd, Eigen::Vector3f &wfd, const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp, Eigen::Vector3f ez);
+        void cartesian2configuration(Eigen::Quaternionf &qd, Eigen::Vector3f &wfd, const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp);
 
         flair::core::Time t0;
 

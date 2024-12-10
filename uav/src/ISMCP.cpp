@@ -28,7 +28,7 @@ void ISMCP::setISMCP(const float m_, const float g_, Eigen::Matrix3f alphap_, Ei
     Kpm = Kpm_;
 }
 
-void ISMCP::solveSubactuation(const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp, Eigen::Vector3f ez) {
+void ISMCP::solveSubactuation(const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp) {
 
     Eigen::Vector3f nup = xiep + alphap*xie;
 
@@ -41,7 +41,7 @@ void ISMCP::solveSubactuation(const float delta_t, Eigen::Quaternionf q, Eigen::
 
     Eigen::Vector3f u = -Kpm*nurp - m*g*ez + m*xirpp;
 
-    float Trs = u.norm();
+    Trs = u.norm();
 
     Eigen::Vector3f Qe3 = q.toRotationMatrix()*ez;
 
@@ -72,6 +72,10 @@ Eigen::Vector3f ISMCP::getWd() {
 
 Eigen::Quaternionf ISMCP::getQd() {
     return qd;
+}
+
+float ISMCP::getTrs() {
+    return Trs;
 }
 
 float ISMCP::sech(float value) {

@@ -130,9 +130,9 @@ void AFNNC::reset() {
     resetISMCP();
 }
 
-void AFNNC::cartesian2configuration(Eigen::Quaternionf &qd, Eigen::Vector3f &wfd, const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp, Eigen::Vector3f ez)
+void AFNNC::cartesian2configuration(Eigen::Quaternionf &qd, Eigen::Vector3f &wfd, const float delta_t, Eigen::Quaternionf q, Eigen::Vector3f xie, Eigen::Vector3f xiep, Eigen::Vector3f xid, Eigen::Vector3f xidpp, Eigen::Vector3f xidppp)
 {
-    solveSubactuation(delta_t, q, xie, xiep, xid, xidpp, xidppp, ez);
+    solveSubactuation(delta_t, q, xie, xiep, xid, xidpp, xidppp);
     qd = getQd();
     wfd = getWd();
 }
@@ -204,10 +204,10 @@ void AFNNC::UpdateFrom(const io_data *data) {
 
 
     // Solve subactuation and get desired quaternion and angular velocity
-    solveSubactuation(delta_t, q, xie, xiep, xid, xidpp, xidppp, w);
+    solveSubactuation(delta_t, q, xie, xiep, xid, xidpp, xidppp);
 
-    Eigen::Quaternionf qd = getQd();
-    Eigen::Vector3f wd = getWd();
+    Eigen::Quaternionf qd = Eigen::Quaternionf(1, 0, 0, 0); //getQd();
+    Eigen::Vector3f wd = Eigen::Vector3f(0.,0.,0.); //getWd();
 
     Eigen::Matrix3f Kdm = Eigen::Vector3f((float)Kd_roll->Value(), (float)Kd_pitch->Value(), (float)Kd_yaw->Value()).asDiagonal();
     Eigen::Matrix3f alphao = Eigen::Vector3f((float)alpha_roll->Value(), (float)alpha_pitch->Value(), (float)alpha_yaw->Value()).asDiagonal();
@@ -229,6 +229,7 @@ void AFNNC::UpdateFrom(const io_data *data) {
 
     Eigen::Vector3f tau = -Kdm*nuq;
 
+	Trs = getTrs();
 
     tau_roll = (float)tau(0)/km->Value();
 
